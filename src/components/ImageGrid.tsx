@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Trash2 } from 'lucide-react';
+import { Button } from './ui/button';
 
 interface Image {
   id: string;
@@ -12,9 +12,10 @@ interface Image {
 
 interface ImageGridProps {
   images: Image[];
+  onDelete: (id: string) => void;
 }
 
-export function ImageGrid({ images }: ImageGridProps) {
+export function ImageGrid({ images, onDelete }: ImageGridProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredImages, setFilteredImages] = useState(images);
 
@@ -48,15 +49,25 @@ export function ImageGrid({ images }: ImageGridProps) {
         {filteredImages.map((image) => (
           <div 
             key={image.id}
-            className="animate-fade-in"
+            className="animate-fade-in relative group"
           >
             <div className="glass-card rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 h-full">
-              <img
-                src={image.url}
-                alt={image.title}
-                className="w-full h-48 object-cover"
-                loading="lazy"
-              />
+              <div className="relative">
+                <img
+                  src={image.url}
+                  alt={image.title}
+                  className="w-full h-48 object-cover"
+                  loading="lazy"
+                />
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  onClick={() => onDelete(image.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
               <div className="p-4">
                 <h3 className="font-medium text-lg">{image.title}</h3>
                 <p className="text-sm text-gray-500 mt-1">{image.name}</p>
