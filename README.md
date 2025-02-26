@@ -13,3 +13,8 @@ There are several ways of editing your application.
 4. Open a terminal in the project folder and install dependencies:
    ```sh
    npm install
+   ```
+5. After that to run the code:
+    ```sh
+   npm run dev
+      
