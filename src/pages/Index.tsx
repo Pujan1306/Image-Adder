@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { ImageUpload } from '@/components/ImageUpload';
 import { ImageGrid } from '@/components/ImageGrid';
@@ -38,6 +37,47 @@ export default function Index() {
       console.error('Error fetching images:', error);
       toast({
         title: "Error fetching images",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDelete = async (imageId: string) => {
+    try {
+      const imageToDelete = images.find(img => img.id === imageId);
+      if (!imageToDelete) return;
+
+      // Extract the filename from the URL
+      const fileName = imageToDelete.url.split('/').pop();
+      if (!fileName) throw new Error('Could not extract filename from URL');
+
+      // Delete the file from storage
+      const { error: storageError } = await supabase.storage
+        .from('images')
+        .remove([fileName]);
+
+      if (storageError) throw storageError;
+
+      // Delete from Supabase database
+      const { error: dbError } = await supabase
+        .from('images')
+        .delete()
+        .eq('id', imageId);
+
+      if (dbError) throw dbError;
+
+      // Update local state
+      setImages(prev => prev.filter(img => img.id !== imageId));
+      
+      toast({
+        title: "Image deleted successfully",
+        description: "The image has been removed from the gallery.",
+      });
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      toast({
+        title: "Error deleting image",
         description: "Please try again later.",
         variant: "destructive",
       });
@@ -105,7 +145,7 @@ export default function Index() {
           </div>
           
           <main>
-            <ImageGrid images={images} />
+            <ImageGrid images={images} onDelete={handleDelete} />
           </main>
         </div>
       </div>
